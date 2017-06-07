@@ -1,19 +1,12 @@
-# Mastodon-api-php
-A GNU Social-compatible microblogging server  https://mastodon.social PHP API
+# Mastodon Wordpress API
+A Mastodon API tailored to the Wordpress HTTP libary.
 
 ## How to use
-require_once '/path/Mastodon_api.php';<br />
-<br />
-$mastodon_api = new Mastodon_api();<br />
-$mastodon_api->set_url('Mastodon url');<br />
-<br />
-// print_r($mastodon_api->create_app('APP Name',null,null,'Mastodon url'));<br />
-$mastodon_api->set_client('client_id','client_secret');<br />
-<br />
-// print_r($mastodon_api->login('your login email','your login password'));<br />
-$mastodon_api->set_token('access_token','token_type');<br />
-<br />
-$mastodon_api->timelines_home();
+Instructions following on the finishing of the translation to wordpress
 
-## Test Mastodon
-https://ery.kr
+## License
+This libary is licensed under the GPLv2.
+For concern of the original license the MIT licensefile is included, but is not applied to this project!
+
+## Credits
+Special Thanks to [yks118](https://github.com/yks118/Mastodon-api-php) for providing us with the mastodon-api-php (MIT License) from which this project is forked.
