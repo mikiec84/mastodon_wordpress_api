@@ -1,20 +1,20 @@
 <?php
-// defined('BASEPATH') OR exit('No direct script access allowed');
+//Wordpress Security function
+	defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 /**
- * Class Mastodon_api
+ * Class mastodon_wordpress_api
  *
  * PHP version 7.1
  *
  * Mastodon     https://mastodon.social/
- * API LIST     https://github.com/tootsuite/documentation/blob/master/Using-the-API/API.md
  *
- * @author      KwangSeon Yun   <middleyks@hanmail.net>
- * @copyright   KwangSeon Yun
- * @license     https://raw.githubusercontent.com/yks118/Mastodon-api-php/master/LICENSE     MIT License
- * @link        https://github.com/yks118/Mastodon-api-php
+ * @author      L1am0   <meet@l1am0.net>
+ * @copyright   L1am0
+ * @license     https://raw.githubusercontent.com/L1am0/mastodon_wordpress_api/master/LICENCSE GPLv2
+ * @link        https://github.com/L1am0/mastodon_wordpress_api/
  */
-class Mastodon_api {
+class mastodon_wordpress_api {
 	private $mastodon_url = '';
 	private $client_id = '';
 	private $client_secret = '';
@@ -99,7 +99,7 @@ class Mastodon_api {
 		}
 
 		if (count($data)) {
-			$parameters[CURLOPT_POSTFIELDS] = json_encode($data);
+			$parameters[CURLOPT_POSTFIELDS] = $data;
 		}
 
 		$url = $this->mastodon_url.$url;
@@ -135,70 +135,72 @@ class Mastodon_api {
 	 * @param   string      $url
 	 * @param   array       $parameters
 	 *
-	 * @return  array       $data
+	 * @return  array       $returnData
 	 */
 	protected function get_content_curl ($url,$parameters = array()) {
-		$data = array();
+		$returnData = array(); #the data we return from the function
+		$args = array(); #the http headers args
+		$body = array(); #the http body
 
-		// set CURLOPT_USERAGENT
-		if (!isset($parameters[CURLOPT_USERAGENT])) {
-			if (isset($_SERVER['HTTP_USER_AGENT'])) {
-				$parameters[CURLOPT_USERAGENT] = $_SERVER['HTTP_USER_AGENT'];
-			} else {
-				// default IE11
-				$parameters[CURLOPT_USERAGENT] = 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko';
-			}
-		}
+		//Set standart values to args
+	    		$args = array(
+	    			'timeout' => '5',
+	    			'redirection' => '5',
+	    			'httpversion' => '1.0',
+	    			'blocking' => true,
+				    'cookies' => array()
+				);
 
-		// check curl_init
-		if (function_exists('curl_init')) {
-			$ch = curl_init();
-
-			// url 설정
-			curl_setopt($ch,CURLOPT_URL,$url);
-
-			foreach ($parameters as $key => $value) {
-				curl_setopt($ch,$key,$value);
-			}
-
-			// https
-			if (!isset($parameters[CURLOPT_SSL_VERIFYPEER])) {
-				curl_setopt($ch,CURLOPT_SSL_VERIFYPEER,FALSE);
-			}
-			if (!isset($parameters[CURLOPT_SSLVERSION])) {
-				curl_setopt($ch,CURLOPT_SSLVERSION,6);
+		//Set USERAGENT
+			if (!isset($parameters[CURLOPT_USERAGENT])) {
+				//There is no given useragent in the parameters
+					if (isset($_SERVER['HTTP_USER_AGENT'])) {
+						$args['user-agent'] = $_SERVER['HTTP_USER_AGENT'];
+					} else {
+						// default IE11
+						$args['user-agent'] = 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko';
+					}
+			}else{
+				//Take the useragent from the parameters
+					$args['user-agent'] = $parameters[CURLOPT_USERAGENT];
 			}
 
-			// no header
-			if (!isset($parameters[CURLOPT_HEADER])) {
-				curl_setopt($ch,CURLOPT_HEADER,0);
+		//Set HEADER
+			if(isset($parameters[CURLOPT_HEADER])){
+				$args['headers'] = $parameters[CURLOPT_HEADER];
 			}
 
-			// POST / GET (default : GET)
-			if (!isset($parameters[CURLOPT_POST]) && !isset($parameters[CURLOPT_CUSTOMREQUEST])) {
-				curl_setopt($ch,CURLOPT_POST,0);
+		//Set BODY
+			if(isset($parameters[CURLOPT_POSTFIELDS])){
+				$body = $parameters[CURLOPT_POSTFIELDS];
 			}
 
-			// response get php value
-			if (!isset($parameters[CURLOPT_RETURNTRANSFER])) {
-				curl_setopt($ch,CURLOPT_RETURNTRANSFER,1);
+
+		//Request method: Standart GET
+			if(isset($parameters[CURLOPT_POST])){ 
+				//POST
+				//Trigger the call
+					$args['method'] = 'POST';
+			}elseif(isset($parameters[CURLOPT_CUSTOMREQUEST])){
+				//CUSTOM
+				//Trigger the call
+					$args['method'] = $parameters[CURLOPT_CUSTOMREQUEST];
+			}else{
+				//GET
+				//Trigger the call
+					$args['method'] = 'GET';
 			}
+		
 
-			// HTTP2
-			if (!isset($parameters[CURLOPT_HTTP_VERSION])) {
-				curl_setopt($ch,CURLOPT_HTTP_VERSION,3);
-			}
-			if (!isset($parameters[CURLINFO_HEADER_OUT])) {
-				curl_setopt($ch,CURLINFO_HEADER_OUT,TRUE);
-			}
+		//Actually trigger request
+			$response = wp_remote_request ( $url , $args );
+		
 
-			$data['html'] = json_decode(curl_exec($ch),true);
-			$data['response'] = curl_getinfo($ch);
-
-			curl_close($ch);
-		}
-
-		return $data;
+		//Build return data
+			$returnData['html'] = wp_remote_retrieve_body($response);
+			$returnData['response'] = wp_remote_retrieve_response_code( $response );
+		//Return the response of the request	
+			return $returnData;
 	}
 
 	/**
