@@ -3,7 +3,7 @@
 	defined( 'ABSPATH' ) or die( 'No script kiddies please!' );
 
 /**
- * Class mastodon_wordpress_api
+ * Class mastodon_wordpress_networking_api
  *
  * PHP version 7.1
  *
@@ -14,7 +14,7 @@
  * @license     https://raw.githubusercontent.com/L1am0/mastodon_wordpress_api/master/LICENCSE GPLv2
  * @link        https://github.com/L1am0/mastodon_wordpress_api/
  */
-class mastodon_wordpress_api {
+class mastodon_wordpress_networking_api {
 	private $mastodon_url = '';
 	private $client_id = '';
 	private $client_secret = '';
