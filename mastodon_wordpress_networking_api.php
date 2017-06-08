@@ -196,10 +196,45 @@ class mastodon_wordpress_networking_api {
 		
 
 		//Build return data
-			$returnData['html'] = wp_remote_retrieve_body($response);
-			$returnData['response'] = wp_remote_retrieve_response_code( $response );
+			$returnData['html'] = json_decode(wp_remote_retrieve_body($response),True);
+			$returnData['response'] = json_decode(wp_remote_retrieve_response_code( $response ));
 		//Return the response of the request	
 			return $returnData;
+	}
+
+
+	/**
+	 * get_client_id
+	 *
+	 */
+	public function get_client_id() {
+		return $this->client_id;
+	}
+
+	/**
+	 * get_client_secret
+	 *
+	 */
+	public function get_client_secret() {
+		return $this->client_secret;
+	}
+
+
+
+	/**
+	 * get_access_token
+	 *
+	 */
+	public function get_access_token() {
+		return $this->token['access_token'];
+	}
+
+	/**
+	 * get_access_token
+	 *
+	 */
+	public function get_token_type() {
+		return $this->token['token_type'];
 	}
 
 	/**
