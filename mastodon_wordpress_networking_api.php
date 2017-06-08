@@ -46,7 +46,7 @@ class mastodon_wordpress_networking_api {
 		}
 
 		if (count($data)) {
-			$parameters[CURLOPT_POSTFIELDS] = http_build_query($data);
+			$parameters[CURLOPT_POSTFIELDS] = $data;
 		}
 
 		$url = $this->mastodon_url.$url;
@@ -140,7 +140,6 @@ class mastodon_wordpress_networking_api {
 	protected function get_content_curl ($url,$parameters = array()) {
 		$returnData = array(); #the data we return from the function
 		$args = array(); #the http headers args
-		$body = array(); #the http body
 
 		//Set standart values to args
 	    		$args = array(
@@ -172,7 +171,7 @@ class mastodon_wordpress_networking_api {
 
 		//Set BODY
 			if(isset($parameters[CURLOPT_POSTFIELDS])){
-				$body = $parameters[CURLOPT_POSTFIELDS];
+				$args['body'] = $parameters[CURLOPT_POSTFIELDS];
 			}
 
 
